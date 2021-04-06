@@ -8,7 +8,7 @@ import {introduction} from '../styles';
 const Home = (props) => {
 
   function selectLanguage(lang){
-    props.navigation.navigate('Jobs', { selectedLanguage: lang });
+    props.navigation.navigate('JobList', { selectedLanguage: lang });
   }
 
   return (

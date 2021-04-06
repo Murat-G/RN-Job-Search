@@ -1,12 +1,82 @@
-import React from 'react';
-import {SafeAreaView, Text} from 'react-native';
+import Axios from 'axios';
+import Modal from 'react-native-modal';
+import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView, Text, View, FlatList, Button, TouchableOpacity } from 'react-native';
 
-const JobList = () => {
+import { jobs } from '../styles';
+import { JobListItem } from '../components';
+
+const JobList = (props) => {
+  const [data, setData] = useState([]);
+  const [selectedJob, setSelectedJob] = useState('');
+  const [modalFlag, setModalFlag] = useState(false);
+  const { selectedLanguage } = props.route.params;
+
+  const fetchData = async () => {
+    const response = await Axios.get(
+      `https://jobs.github.com/positions.json?search=${selectedLanguage.toLowerCase()}`,
+    );
+    setData(response.data);
+  };
+
+  useEffect(() => {
+    fetchData();
+  });
+
+
+  const onJobSelect = (job) => {
+    setModalFlag(true);
+    setSelectedJob(job);
+  };
+
+  const renderJobs = ({ item }) => (
+    <JobListItem job={item} onSelect={() => onJobSelect(item)} />
+  );
+
+  const onJobSave = async () => {
+    let savedJobList = await AsyncStorage.getItem('@SAVED_JOBS');
+    savedJobList = savedJobList == null ? [] : JSON.parse(savedJobList);
+
+    const updatedJobList = [...savedJobList, selectedJob];
+
+    AsyncStorage.setItem('@SAVED_JOBS', JSON.stringify(updatedJobList));
+
+  };
   return (
-    <SafeAreaView>
-      <Text> Job JobList</Text>
+    <SafeAreaView style={jobs.jobsContainer}>
+      <View style={jobs.jobsView}>
+        <Text
+          style={jobs.jobsText}>
+          JOBS FOR {selectedLanguage.toUpperCase()}
+        </Text>
+        <FlatList data={data} renderItem={renderJobs} />
+
+        <TouchableOpacity
+          style={jobs.jobsButton}
+          onPress={() => props.navigation.navigate('JobSave')}
+        >
+          <Text style={jobs.jobsButtonText}>Kayıtlıları Gör</Text>
+        </TouchableOpacity>
+
+        <Modal isVisible={modalFlag} onBackdropPress={() => setModalFlag(false)}>
+          <View style={jobs.modalBackground}>
+            <View style={jobs.modalContainer}>
+              <Text style={jobs.jobTitle}>{selectedJob.title}</Text>
+              <Text>
+                {selectedJob.location} / {selectedJob.title}
+              </Text>
+              <Text>{selectedJob.company}</Text>
+            </View>
+            <View style={jobs.jobDesc}>
+              <Text numberOfLines={5}>{selectedJob.description}</Text>
+            </View>
+            <Button title="Kaydet" onPress={onJobSave} />
+          </View>
+        </Modal>
+      </View>
     </SafeAreaView>
   );
 };
 
-export {JobList};
+export { JobList };
