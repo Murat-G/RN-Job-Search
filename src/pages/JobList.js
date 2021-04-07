@@ -2,7 +2,7 @@ import Axios from 'axios';
 import Modal from 'react-native-modal';
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SafeAreaView, Text, View, FlatList, Button, TouchableOpacity } from 'react-native';
+import { SafeAreaView, Text, View, FlatList, Button, TouchableOpacity} from 'react-native';
 
 import { jobs } from '../styles';
 import { JobListItem } from '../components';
@@ -13,17 +13,16 @@ const JobList = (props) => {
   const [modalFlag, setModalFlag] = useState(false);
   const { selectedLanguage } = props.route.params;
 
-  const fetchData = async () => {
-    const response = await Axios.get(
-      `https://jobs.github.com/positions.json?search=${selectedLanguage.toLowerCase()}`,
-    );
-    setData(response.data);
-  };
-
   useEffect(() => {
     fetchData();
-  });
+  },[]);
 
+  const fetchData = async () => {
+    const response = await Axios.get(
+        `https://jobs.github.com/positions.json?search=${selectedLanguage.toLowerCase()}`,
+      );
+      setData(response.data);
+  };
 
   const onJobSelect = (job) => {
     setModalFlag(true);
@@ -39,24 +38,32 @@ const JobList = (props) => {
     savedJobList = savedJobList == null ? [] : JSON.parse(savedJobList);
 
     const updatedJobList = [...savedJobList, selectedJob];
-
-    AsyncStorage.setItem('@SAVED_JOBS', JSON.stringify(updatedJobList));
-
+    AsyncStorage.setItem('@SAVED_JOBS', JSON.stringify(updatedJobList),setModalFlag(false));
   };
+
   return (
     <SafeAreaView style={jobs.jobsContainer}>
+      <TouchableOpacity
+          onPress={() => props.navigation.goBack()}
+          style={jobs.backButton}
+        >
+          <Text style={jobs.jobsButtonText}>go back</Text>
+
+        </TouchableOpacity>
       <View style={jobs.jobsView}>
         <Text
           style={jobs.jobsText}>
           JOBS FOR {selectedLanguage.toUpperCase()}
         </Text>
+
         <FlatList data={data} renderItem={renderJobs} />
 
         <TouchableOpacity
           style={jobs.jobsButton}
-          onPress={() => props.navigation.navigate('JobSave')}
+          onPress={() => props.navigation.navigate('JobSavePage')}
         >
           <Text style={jobs.jobsButtonText}>Kayıtlıları Gör</Text>
+
         </TouchableOpacity>
 
         <Modal isVisible={modalFlag} onBackdropPress={() => setModalFlag(false)}>

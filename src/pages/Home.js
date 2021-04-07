@@ -8,7 +8,7 @@ import {introduction} from '../styles';
 const Home = (props) => {
 
   function selectLanguage(lang){
-    props.navigation.navigate('JobList', { selectedLanguage: lang });
+    props.navigation.navigate('JobListPage', { selectedLanguage: lang });
   }
 
   return (
@@ -21,6 +21,7 @@ const Home = (props) => {
       <ScrollView
         horizontal
         contentContainerStyle={introduction.bannerScroll}
+        showsHorizontalScrollIndicator={false}
       >
           {
             jobTitles.map(t=> {
