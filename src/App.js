@@ -11,7 +11,7 @@ function App () {
       <Stack.Navigator screenOptions={{headerShown:false}}>
         <Stack.Screen name="HomePage" component={Home} />
         <Stack.Screen name="JobListPage" component={JobList} />
-        <Stack.Screen name="JobSavePAge" component={JobSave} />
+        <Stack.Screen name="JobSavePage" component={JobSave} />
       </Stack.Navigator>
     </NavigationContainer>
   );
