@@ -126,4 +126,7 @@ export const JobSaveItemStyle = StyleSheet.create({
     textButton: {
         color:'white',
     },
+    container:{
+        flex: 1,
+    },
 });
